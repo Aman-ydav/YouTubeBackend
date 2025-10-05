@@ -3,7 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
+import { cleanupLocalFiles } from "../utils/fileCleanUp.js";
 
 const registerUser = asyncHandler(async (req, res, next) => {
 
@@ -22,8 +22,9 @@ const registerUser = asyncHandler(async (req, res, next) => {
     console.log(fullName, email, userName, password);
     
     
-    if([fullName, email, userName, password].some((field)=>field?.trim()==="")){
-        throw new ApiError(400,"Full Name is required");
+    if([fullName, email, userName, password].some((field)=>!field?.trim() || !field)){
+        cleanupLocalFiles(req.files);
+        throw new ApiError(400,"All(*) fields are required");
     }
 
     
@@ -32,6 +33,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     })
 
     if(existedUser){
+        cleanupLocalFiles(req.files);
         throw new ApiError(409, "User already exist with this email or username");
     }
 
@@ -49,6 +51,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
 
     if(!avatarLocalPath){
+        cleanupLocalFiles(req.files);
         throw new ApiError(400, "Avatar is required");
     }
 
@@ -57,6 +60,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
     
     if(!avatar){
+        cleanupLocalFiles(req.files);
         throw new ApiError(500, "Error in uploading avatar on cloudinary");
     }
     
@@ -73,6 +77,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     
     const createdUser = await User.findById(newuser._id).select("-password -refreshToken");
     if(!createdUser){
+        cleanupLocalFiles(req.files);
         throw new ApiError(500, "User not found while registration");
     }
 
