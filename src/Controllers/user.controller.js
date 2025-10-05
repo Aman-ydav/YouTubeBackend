@@ -27,7 +27,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     }
 
     
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{email}, {userName}]
     })
 
@@ -37,7 +37,16 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
 
     const avatarLocalPath =  req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImageLocalPath = req.files.coverImage[0].path;
+    } else {
+        coverImageLocalPath = null; // or handle the absence of cover image as needed
+    }
+
+
 
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar is required");
@@ -52,7 +61,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     }
     
     
-    const user = await User.create({
+    const newuser = await User.create({
         fullName,
         email,
         userName: userName.toLowerCase(),
@@ -62,8 +71,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     })
     
     
-    const createdUser = await user.findById(user._id).select("-password -refreshToken");
-
+    const createdUser = await User.findById(newuser._id).select("-password -refreshToken");
     if(!createdUser){
         throw new ApiError(500, "User not found while registration");
     }
