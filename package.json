@@ -7,7 +7,7 @@
     "Chai"
   ],
   "license": "ISC",
-  "author": "AMAN",
+  "author": "Aman",
   "type": "module",
   "main": "index.js",
   "scripts": {
