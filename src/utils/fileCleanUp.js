@@ -5,10 +5,8 @@ export const cleanupLocalFiles = (files) => {
   Object.values(files)
     .flat()
     .forEach((file) => {
-      if (file?.path) {
-        fs.unlink(file.path, (err) => {
-          if (err) console.error("Failed to cleanup local file:", file.path, err);
-        });
+      if (file?.path && fs.existsSync(file.path)) {
+        fs.unlink(file.path);
       }
     });
 };
