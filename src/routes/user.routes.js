@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { registerUser, loginUser, logoutUser,refreshAccessToken,changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile} from "../Controllers/user.controller.js";
+import { registerUser, loginUser, logoutUser,refreshAccessToken,changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile, getWatchHistory} from "../Controllers/user.controller.js";
 import { upload } from "../middlewares/multor.middleware.js";   
 import {verifyJWT}  from '../middlewares/auth.middleware.js';
+import { get } from "mongoose";
 
 const router = Router();
 
@@ -21,13 +22,13 @@ router.route("/logout").post(verifyJWT, logoutUser);
 
 router.route("/refresh-token").post(refreshAccessToken);
 
-router.route("/update-avatar").post(
+router.route("/update-avatar").patch(
     verifyJWT,
     upload.single("avatar"),
     updateUserAvatar
 );
 
-router.route("/update-cover-image").post(
+router.route("/update-cover-image").patch(
     verifyJWT,
     upload.single("coverImage"),
     updateUserCoverImage
@@ -37,10 +38,10 @@ router.route("/get-current-user").get(verifyJWT, getCurrentUser);
 
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 
-router.route("/update-account-details").post(verifyJWT, updateAccountDetails);
+router.route("/update-account-details").patch(verifyJWT, updateAccountDetails);
 
-router.route("/channel/:username").get(getUserChannelProfile);
+router.route("/channel/:username").get(verifyJWT ,getUserChannelProfile);
 
-
+router.route("/watch-history").get(verifyJWT, getWatchHistory);
 
 export default router;

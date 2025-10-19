@@ -1,10 +1,10 @@
 {
-  "name": "chaiproject",
+  "name": "node",
   "version": "1.0.0",
-  "description": "this is youtube backend project",
+  "description": "this is backend for video streaming app",
   "keywords": [
     "JS",
-    "Chai"
+    "Node"
   ],
   "license": "ISC",
   "author": "Aman",
